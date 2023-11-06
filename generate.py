@@ -8,6 +8,7 @@ import torchtext
 import numpy as np
 from tqdm import tqdm
 import math
+from random import randint
 
 from utils import generate
 # from model import LTSM
@@ -115,9 +116,12 @@ if __name__ == "__main__":
     criterion = nn.CrossEntropyLoss()
     
     # load neural net
-    model.load_state_dict(torch.load('best-val-lstm_lm.pt',  map_location=device))
+    model.load_state_dict(torch.load('model-lstm_lm.pt',  map_location=device))
 
     while True:
         prompt = input("Enter prompt>> ")
-        response = respond(prompt,30,0.75,2)
-        print(response)
+        for t in [0.7,0.75,0.9,1]:
+            seed = randint(0,vocab_size)
+            print("seed:",seed)
+            response = respond(prompt,10,t,seed)
+            print(response, end="\n\n")
