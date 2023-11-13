@@ -5,7 +5,11 @@ start = "*** START OF THE PROJECT GUTENBERG"
 end = "*** END OF THE PROJECT GUTENBERG"
 
 def process(path):
-    with open(f"data{os.sep}{path.split(os.sep)[-1].split('.')[0]}_parsed.txt","w", encoding='utf-8') as ofp:
+    save_path = f"data{os.sep}{path.split(os.sep)[-1].split('.')[0]}_parsed.txt"
+    if os.path.exists(save_path):
+        return
+    print(path)
+    with open(save_path,"w", encoding='utf-8') as ofp:
         with open(path,"r", encoding='utf-8') as ifp:
             write = False
             for l in ifp:
@@ -26,7 +30,6 @@ def process(path):
 if __name__ == "__main__":
     for file in os.listdir("raw_data"):
         fname = f"raw_data\{file}"
-        print(fname)
         process(fname)
 
     # fname = f"raw_data\peter_rabbit.txt"
