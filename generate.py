@@ -75,7 +75,7 @@ class LSTM(nn.Module):
         cell = cell.detach()
         return hidden, cell
 
-punctuation = set(['.',',','"',"'"])
+punctuation = set(['.',',','"',"'","?"])
 
 # set the embedding and hidden dimensions as the same value because we will use weight tying
 embedding_dim = 1024             # 400 in the paper
@@ -97,12 +97,15 @@ def evaluate():
 def respond(prompt, max_len, temp, seed):
     generation = generate(prompt, max_len, temp, model, tokenizer,
                                 vocab, device, seed)
+    if len(generation)==0:
+        generation = generate(prompt, max_len, temp, model, tokenizer,
+                                vocab, device, seed)
     for i in range(len(generation)):
         if generation[i] in punctuation and i>0:
             generation[i-1]+=generation[i]
             generation[i]=""
             i-=1
-    return ' '.join(generation)
+    return ' '.join([i for i in generation if i])
 
 if __name__ == "__main__":
     device = "cpu"
@@ -120,8 +123,10 @@ if __name__ == "__main__":
 
     while True:
         prompt = input("Enter prompt>> ")
+        if prompt == "quit":
+            break
         for t in [0.7,0.75,0.9,1]:
             seed = randint(0,vocab_size)
-            print("seed:",seed)
-            response = respond(prompt,10,t,seed)
+            print(f"seed: {seed} | temp: {t}")
+            response = respond(prompt,20,t,seed)
             print(response, end="\n\n")
