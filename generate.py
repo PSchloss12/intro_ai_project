@@ -13,6 +13,7 @@ from random import randint
 from utils import generate
 # from model import LTSM
 from data import get_vocab_tokenizer
+import sys
 
 class LSTM(nn.Module):
     def __init__(self, vocab_size, embedding_dim, hidden_dim, num_layers, dropout_rate,
@@ -119,14 +120,18 @@ if __name__ == "__main__":
     criterion = nn.CrossEntropyLoss()
     
     # load neural net
-    model.load_state_dict(torch.load('model-lstm_lm.pt',  map_location=device))
+    path = r"C:\Users\12625\Desktop\Code\Intro_AI\old\model-lstm_lm.pt"
+    model.load_state_dict(torch.load(path,  map_location=device))
 
-    while True:
-        prompt = input("Enter prompt>> ")
-        if prompt == "quit":
-            break
-        for t in [0.7,0.75,0.9,1]:
-            seed = randint(0,vocab_size)
-            print(f"seed: {seed} | temp: {t}")
-            response = respond(prompt,20,t,seed)
-            print(response, end="\n\n")
+    # while True:
+    #     prompt = input("Enter prompt>> ")
+    #     if prompt == "quit":
+    #         break
+    #     for t in [0.7,0.75,0.9,1]:
+    #         seed = randint(0,vocab_size)
+    #         print(f"seed: {seed} | temp: {t}")
+    #         response = respond(prompt,20,t,seed)
+    #         print(response, end="\n\n")
+    seed = randint(0,vocab_size)
+    t = 0.8
+    print(respond(sys.argv[1], 30, t, seed))
