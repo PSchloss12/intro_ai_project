@@ -76,8 +76,6 @@ class LSTM(nn.Module):
         cell = cell.detach()
         return hidden, cell
 
-punctuation = set(['.',',','"',"'","?"])
-
 # set the embedding and hidden dimensions as the same value because we will use weight tying
 embedding_dim = 1024             # 400 in the paper
 hidden_dim = 1024                # 1150 in the paper
@@ -95,12 +93,13 @@ def evaluate():
     test_loss = evaluate(model, test_data, criterion, batch_size, seq_len, device)
     print(f'Test Perplexity: {math.exp(test_loss):.3f}')
 
-def respond(prompt, max_len, temp, seed):
+def respond(prompt, max_len, temp, seed, device, tokenizer, vocab, model):
     generation = generate(prompt, max_len, temp, model, tokenizer,
                                 vocab, device, seed)
     if len(generation)==0:
         generation = generate(prompt, max_len, temp, model, tokenizer,
                                 vocab, device, seed)
+    punctuation = set(['.',',','"',"'","?", "!"])
     for i in range(len(generation)):
         if generation[i] in punctuation and i>0:
             generation[i-1]+=generation[i]
@@ -113,6 +112,7 @@ if __name__ == "__main__":
 
     vocab, tokenizer = get_vocab_tokenizer()
     vocab_size = len(vocab)
+    print(vocab_size)
 
     # initialize the model, optimizer and loss criterion
     model = LSTM(vocab_size, embedding_dim, hidden_dim, num_layers, dropout_rate, tie_weights).to(device)
@@ -120,18 +120,17 @@ if __name__ == "__main__":
     criterion = nn.CrossEntropyLoss()
     
     # load neural net
-    path = r"C:\Users\12625\Desktop\Code\Intro_AI\old\model-lstm_lm.pt"
-    model.load_state_dict(torch.load(path,  map_location=device))
+    # path = r"C:\Users\12625\Desktop\Code\Intro_AI\model-lstm_lm.pt"
+    path = r"C:\Users\12625\Desktop\Code\Intro_AI\jupyter_best_model-lstm.pt"
+    model.load_state_dict(torch.load(path, map_location=device))
 
-    # while True:
-    #     prompt = input("Enter prompt>> ")
-    #     if prompt == "quit":
-    #         break
-    #     for t in [0.7,0.75,0.9,1]:
-    #         seed = randint(0,vocab_size)
-    #         print(f"seed: {seed} | temp: {t}")
-    #         response = respond(prompt,20,t,seed)
-    #         print(response, end="\n\n")
-    seed = randint(0,vocab_size)
-    t = 0.8
-    print(respond(sys.argv[1], 30, t, seed))
+    while True:
+        prompt = input("Enter prompt>> ")
+        if prompt == "quit":
+            break
+        for t in [0.7, 0.85, 0.1]:
+            seed = randint(0,vocab_size)
+            # seed = 50
+            print(f"seed: {seed} | temp: {t}")
+            response = respond(prompt,30,t,seed, device, tokenizer, vocab, model)
+            print(response, end="\n\n")
