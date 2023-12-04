@@ -1,5 +1,6 @@
 # StoryBoard Project
 Author: Patrick Schlosser
+
 This project was designed for the Introduction to AI class at the University of Notre Dame. 
 This model is designed to aid in the writing of stories especially childrens stories. It is not meant to answer questions but instead should be prompted with 5 words of a story. 
 # Usage
